@@ -1,0 +1,441 @@
+3.fork
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+  
+    // make two process which run same
+    // program after this instruction
+    fork();
+  
+    printf("Hello world!\n");
+    return 0;
+}
+
+// output:Hello world!
+//        Hello world!
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+4.fcfs 
+
+#include <stdio.h>
+void main()
+{
+    int n;
+    printf("Enter number of process: ");
+    scanf("%d", &n);
+
+    int at[n];
+    int bt[n];
+
+    printf("Enter arrival time for each process:\n");
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &at[i]);
+    }
+
+    printf("Enter burst time for each process:\n");
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &bt[i]);
+    }
+
+    int st[n];
+    int wt[n];
+    int ct[n];
+    int tat[n];
+
+    for (int i = 0; i < n; i++)
+    {
+        if (i == 0)
+        {
+            st[0] = at[0];
+            wt[0] = st[0] - at[0];
+            ct[0] = st[0] + bt[0];
+            tat[0] = ct[0] - at[0];
+        }
+        else
+        {
+            st[i] = ct[i - 1];
+            wt[i] = st[i] + at[i];
+            ct[i] = st[i] + bt[i];
+            tat[i] = ct[i] - at[i];
+        }
+    }
+
+    printf("P\t|\tA.T.\t|\tB.T.\t|\tS.T.\t|\tW.T.\t|\tC.T.\t|\tT.A.T.\n");
+    printf("---------------------------------------------------------------------------------------------------------\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("p%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\n", i + 1, at[i], bt[i], st[i], wt[i], ct[i], tat[i]);
+    }
+   int stat=0;
+   for(int i=0;i<n;i++)
+   {
+       stat=stat+tat[i];
+   }
+   double avtat=stat/n;
+   printf("Average tat is %f.\n",avtat);
+
+    int swt=0;
+   for(int i=0;i<n;i++)
+   {
+       swt=swt+wt[i];
+   }
+   double avwt=swt/n;
+   printf("Average wt is %f.",avwt);
+   
+}
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+5. sjf
+
+#include <stdio.h>
+int main()
+{
+    int i, j, n, total = 0, pos, temp;
+    float avg_wt, avg_tat;
+    printf("Enter number of Process:");
+    scanf("%d", &n);
+
+    int bt[n], p[n], wt[n], tat[n];
+
+    printf("Enter Burst Time for each process:\n");
+    for (i = 0; i < n; i++)
+    {
+        printf("P%d:", i + 1);
+        scanf("%d", &bt[i]);
+        p[i] = i + 1;
+    }
+
+    // sorting of burst times
+    for (i = 0; i < n; i++)
+    {
+        pos = i;
+        for (j = i + 1; j < n; j++)
+        {
+            if (bt[j] < bt[pos])
+                pos = j;
+        }
+
+        temp = bt[i];
+        bt[i] = bt[pos];
+        bt[pos] = temp;
+
+        temp = p[i];
+        p[i] = p[pos];
+        p[pos] = temp;
+    }
+
+
+    wt[0] = 0;
+
+    for (i = 1; i < n; i++)
+    {
+        wt[i] = 0;
+        for (j = 0; j < i; j++)
+            wt[i] = wt[i] + bt[j];
+
+        total = total + wt[i];
+    }
+
+    avg_wt = (float)total / n;
+    total = 0;
+
+    printf("\nProcess       Burst Time       Waiting           Time Turnaround Time");
+    for (i = 0; i < n; i++)
+    {
+        tat[i] = bt[i] + wt[i];
+        total = total + tat[i];
+        printf("\np%d\t\t  %d\t\t    %d\t\t\t%d", p[i], bt[i], wt[i], tat[i]);
+    }
+
+    avg_tat = (float)total / n;
+    printf("\nAverage Waiting Time=%f", avg_wt);
+    printf("\nAverage Turnaround Time=%fn", avg_tat);
+}
+
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+6.priority
+
+#include<stdio.h>
+ 
+int main()
+{
+    int bt[20],p[20],wt[20],tat[20],pr[20],i,j,n,total=0,pos,temp,avg_wt,avg_tat;
+    printf("Enter Total Number of Process:");
+    scanf("%d",&n);
+ 
+    printf("\nEnter Burst Time and Priority\n");
+    for(i=0;i<n;i++)
+    {
+        printf("\nP[%d]\n",i+1);
+        printf("Burst Time:");
+        scanf("%d",&bt[i]);
+        printf("Priority:");
+        scanf("%d",&pr[i]);
+        p[i]=i+1;           //contains process number
+    }
+ 
+    //sorting burst time, priority and process number in ascending order using selection sort
+    for(i=0;i<n;i++)
+    {
+        pos=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(pr[j]<pr[pos])
+                pos=j;
+        }
+ 
+        temp=pr[i];
+        pr[i]=pr[pos];
+        pr[pos]=temp;
+ 
+        temp=bt[i];
+        bt[i]=bt[pos];
+        bt[pos]=temp;
+ 
+        temp=p[i];
+        p[i]=p[pos];
+        p[pos]=temp;
+    }
+ 
+    wt[0]=0; //waiting time for first process is zero
+ 
+    //calculate waiting time
+    for(i=1;i<n;i++)
+    {
+        wt[i]=0;
+        for(j=0;j<i;j++)
+            wt[i]+=bt[j];
+ 
+        total+=wt[i];
+    }
+ 
+    avg_wt=total/n;      //average waiting time
+    total=0;
+ 
+    printf("\nProcess\t    Burst Time    \tWaiting Time\tTurnaround Time");
+    for(i=0;i<n;i++)
+    {
+        tat[i]=bt[i]+wt[i];     //calculate turnaround time
+        total+=tat[i];
+        printf("\nP[%d]\t\t  %d\t\t    %d\t\t\t%d",p[i],bt[i],wt[i],tat[i]);
+    }
+ 
+    avg_tat=total/n;     //average turnaround time
+    printf("\n\nAverage Waiting Time=%d",avg_wt);
+    printf("\nAverage Turnaround Time=%d\n",avg_tat);
+ 
+return 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+7.directory
+#include<stdio.h>
+void main()
+{
+    int i=0;
+    int j=0,ch;
+    char dname[10],fname[10];
+
+    printf("Enter directory name:");
+    scanf("%s",&dname);
+    
+    do{
+        printf("Enter file name to create:");
+        scanf("%s",&fname);
+        printf("Want to create another file(yes-1 or no-0)");
+        scanf("%d",&ch);
+    }
+    while(i==1);
+    printf("Directory:%s\n",dname);
+    printf("File:%s",fname);
+   
+}
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+8.fifo
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+9.fcfs disk scheduling
+#include<stdio.h>
+#include<stdlib.h>
+void main()
+{
+    int rq[100],i,n,totalheadmoment=0,initial;
+
+    printf("Enter number of request:");
+    scanf("%d",&n);
+    printf("Enter request sequence:\n");
+    for(i=0;i<n;i++)
+    {
+        scanf("%d",&rq[i]);
+    }    
+    printf("Enter initial head position:");
+    scanf("%d",&initial);
+
+    for(i=0;i<n;i++)
+    {
+        totalheadmoment=totalheadmoment+(rq[i]-initial);
+        initial=rq[i];
+    }
+    printf("Total Head Moment is %d.",totalheadmoment);
+}
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+10.best fit
+
+#include<stdio.h>
+ 
+void main()
+{
+int fragment[20],b[20],p[20],i,j,nb,np,temp,lowest=9999;
+static int barray[20],parray[20];
+printf("\n\t\t\tMemory Management Scheme - Best Fit");
+printf("\nEnter the number of blocks:");
+scanf("%d",&nb);
+printf("Enter the number of processes:");
+scanf("%d",&np);
+printf("\nEnter the size of the blocks:-\n");
+for(i=1;i<=nb;i++)
+    {
+printf("Block no.%d:",i);
+        scanf("%d",&b[i]);
+    }
+printf("\nEnter the size of the processes :-\n");
+for(i=1;i<=np;i++)
+    {
+        printf("Process no.%d:",i);
+        scanf("%d",&p[i]);
+    }
+for(i=1;i<=np;i++)
+{
+for(j=1;j<=nb;j++)
+{
+if(barray[j]!=1)
+{
+temp=b[j]-p[i];
+if(temp>=0)
+if(lowest>temp)
+{
+parray[i]=j;
+lowest=temp;
+}
+}
+}
+fragment[i]=lowest;
+barray[parray[i]]=1;
+lowest=10000;
+}
+printf("\nProcess_no\tProcess_size\tBlock_no\tBlock_size\tFragment");
+for(i=1;i<=np && parray[i]!=0;i++)
+printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d",i,p[i],parray[i],b[parray[i]],fragment[i]);
+}
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+11.semaphore
+
+#include<stdio.h>
+void main()
+{
+    int buffer[10],produce,consume,choice=0;
+    int in=0,out=0,count=0,n=5;
+
+    while(choice!=3)
+    {
+        printf("1.produce\t2.consume\t3.exit\n");
+        printf("Enter your choice:\n");
+        scanf("%d",&choice);
+        switch(choice)
+        {
+            case 1:if(count==1)
+            printf("Buffer is full.\n");
+            else{
+                printf("Enter the value:\n");
+                scanf("%d",&produce);
+
+                buffer[in]=produce;
+                in=(in+1)/n;
+                count=count+1;
+            }
+                break;
+
+                case 2:if(count==0)
+                printf("Buffer is empty.\n");
+                else{
+                    consume=buffer[out];
+                    printf("The consumed value is %d\n",consume);
+                    out=(out+1)/n;
+                    count=count+1;
+                }
+                break;
+            }
+        }
+    }
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+12.paging
+#include<stdio.h>
+#define MAX 50
+void main()
+{
+    int page[MAX],i,n,f,p,s,off,pno;
+    int choice=0;
+
+    printf("Enter number of pages in memory:");
+    scanf("%d",&n);
+    printf("Enter page size:");
+    scanf("%d",&s);
+    printf("Enter number of frames:");
+    scanf("%d",&f);
+
+    for(i=0;i<n;i++)
+    {
+        page[i]=-1;
+    }
+    printf("Enter page table:\n");
+    printf("Enter frame no. as -1(if that page is not present in any frame)\n");
+    printf("Page no.\tframe no.\n");
+    for(i=0;i<n;i++)
+    {
+        printf("%d\t\t",i);
+        scanf("%d",&page[i]);
+    }
+    do{
+        printf("Enter logical address(i.e.page no & offset):");
+        scanf("%d %d",&pno,&off);
+
+        if(page[pno]==-1)
+        printf("The required page is not available in nay of frame:");
+        else
+        printf("Physical address(i.e.frame no and offset):%d  %d",page[pno],off);
+
+        printf("\nDo you wnat to continue(1/0):");
+        scanf("%d",&choice);
+    }
+    while(choice==1);
+}
